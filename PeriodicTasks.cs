@@ -18,7 +18,7 @@ public class PeriodicTasksService : BackgroundService
     private CrontabSchedule _schedule;
     private DateTime _nextRun;
 
-    private  string Schedule => "0 * * * *	"; //Runs every hour
+    private  string Schedule => "0 */1 * * *"; //Runs every hour
 
     private readonly IServiceScopeFactory scopeFactory;
     public PeriodicTasksService(IServiceScopeFactory scopeFactory)
