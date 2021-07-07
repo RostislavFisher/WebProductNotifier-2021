@@ -24,27 +24,41 @@ namespace WebProductNotifier.Controllers
         {
             _context = context;
         }
+        
 
         public ActionResult CheckIfAlreadyAdded(string ItemID, string ShopKey, string personID)
         {
             using (var context = new ProductDbContext())
             {
+                // Найти пользователя по его ID. Если пользователя нет - возвращается null
                 ApplicationUser person = _context.Users.FirstOrDefault(i => i.Id == personID);
+                // Пользователя нет
                 if (person == null)
                 {
+                    // результат:
+                    // {
+                    //     "result": "error: personID is invalid"
+                    // }
                     return Content(JsonConvert.SerializeObject(new JsonSimpleResult{key = "result", value="error: personID is invalid"}));  
                 }
-                else
-                {
-                    var section = _context.Users
-                        .Include(s => s.Products)
-                        .FirstOrDefault(s => s.Id == personID);
+                
+                
+                // Пользователь есть - код продолжается
+                // Получить список товаров пользователя по его ID
+                var section = _context.Users
+                    .Include(s => s.Products)
+                    .FirstOrDefault(s => s.Id == personID);
 
-                    string result = (!section.Products.Where(i => i.ShopKey == ShopKey && i.ItemID == ItemID)
-                        .IsNullOrEmpty()).ToString();
-                    return Content(JsonConvert.SerializeObject(new JsonSimpleResult{key = "result", value=result}));
+                // Проверить, есть ли конкретно этот товар у пользователя в списке
+                string result = (!section.Products.Where(i => i.ShopKey == ShopKey && i.ItemID == ItemID)
+                    .IsNullOrEmpty()).ToString();
+                // результат:
+                // {
+                //     "result": "True"
+                // }
+                return Content(JsonConvert.SerializeObject(new JsonSimpleResult{key = "result", value=result}));
                     
-                }
+                
             }
         }
 
@@ -52,43 +66,78 @@ namespace WebProductNotifier.Controllers
         {
             using (var context = new ProductDbContext())
             {
+                // Найти пользователя по его ID. Если пользователя нет - возвращается null
                 ApplicationUser person = _context.Users.FirstOrDefault(i => i.Id == personID);
+                // Пользователя нет
                 if (person == null)
                 {
+                    // результат:
+                    // {
+                    //     "result": "error: personID is invalid"
+                    // }
                     return Content(JsonConvert.SerializeObject(new JsonSimpleResult{key = "result", value="error: personID is invalid"}));
                 }
-                else
-                {
-                    context.Product.RemoveRange(context.Product.Where(x => x.ShopKey == ShopKey && x.ItemID == ItemID));
-                }
+                
+                
+                // Пользователь есть - код продолжается
+                // Получить список товаров пользователя по его ID
+                var section = _context.Users
+                    .Include(s => s.Products)
+                    .FirstOrDefault(s => s.Id == personID);
 
+                // Удалить товар
+                context.Product.RemoveRange(section.Products.Where(i => i.ShopKey == ShopKey && i.ItemID == ItemID));
                 context.SaveChanges();
                 _context.SaveChanges();
+   
+                // результат:
+                // {
+                //     "result": "True"
+                // }
                 return Content(JsonConvert.SerializeObject(new JsonSimpleResult{key = "result", value="SuccessfullyDeleted"}));
             } 
         }
+        
         public ActionResult AddToNotify(string ItemID, string ShopKey, int Price, string personID)
         {
             using (var context = new ProductDbContext())
             {
+                // Найти пользователя по его ID. Если пользователя нет - возвращается null
                 ApplicationUser person = _context.Users.FirstOrDefault(i => i.Id == personID);
+                // Пользователя нет
                 if (person == null)
                 {
+                    // результат:
+                    // {
+                    //     "result": "error: personID is invalid"
+                    // }
                     return Content(JsonConvert.SerializeObject(new JsonSimpleResult{key = "result", value="error: personID is invalid"}));
                 }
-                else
-                {
-                    var newProduct = new Product () {Price = Price, ShopKey = ShopKey, ItemID = ItemID};
-                    context.Product.RemoveRange(context.Product.Where(x => x.ShopKey == ShopKey && x.Price == Price && x.ItemID == ItemID));
-                    context.Product.Add(newProduct);
-                    var newListOfUsersProducts = new List<Product> { newProduct };
-                    person.Products = newListOfUsersProducts;
-                    
-                }
+                
+                // Пользователь есть - код продолжается
+                // Получить список товаров пользователя по его ID
+                var section = _context.Users
+                    .Include(s => s.Products)
+                    .FirstOrDefault(s => s.Id == personID);
+                
+                
+                // Создание экземляра объекта Product
+                var newProduct = new Product () {Price = Price, ShopKey = ShopKey, ItemID = ItemID};
+                
+                // Удаляем повторы товара в список товаров пользователя до этого: (если объекта в БД нету - код не выдаст ошибку)
+                context.Product.RemoveRange(section.Products.Where(i => i.ShopKey == ShopKey && i.ItemID == ItemID));
+                
+                // Добавляем товар в список товаров пользователя
+                context.Product.Add(newProduct);
+                person.Products = new List<Product> { newProduct };
 
                 context.SaveChanges();
                 _context.SaveChanges();
             }
+            // результат:
+            // {
+            //     "result": "SuccessfullyAdded"
+            // }
             return Content(JsonConvert.SerializeObject(new JsonSimpleResult{key = "result", value="SuccessfullyAdded"}));
         }
         

@@ -12,11 +12,14 @@ namespace WebProductNotifier.Controllers
     {
         public ActionResult Search(string ShopTitle, string Manufacturer, string FirstPriceScope, string SecondPriceScope, string Title)
         {
+            // Создание списка с магазинами
             IDictionary<string, SearchInterface> dict = new Dictionary<string, SearchInterface>();
-            ObjectSearch objectSearch = new ObjectSearch {ShopTitle = ShopTitle, Manufacturer = Manufacturer, FirstPriceScope = FirstPriceScope, SecondPriceScope=SecondPriceScope, Title=Title};
-            
             dict["Rozetka"] = new Rozetka();
             dict["Foxtrot"] = new Foxtrot();
+            
+            // Сборка аргументов в один объект
+            ObjectSearch objectSearch = new ObjectSearch {ShopTitle = ShopTitle, Manufacturer = Manufacturer, FirstPriceScope = FirstPriceScope, SecondPriceScope=SecondPriceScope, Title=Title};
+            // Получение списка товаров по коду магазина и объекту сборки аргументов
             List<ProductObject> productSearchList =  dict[ShopTitle].searchProduct(objectSearch);
             string result = JsonConvert.SerializeObject(productSearchList);
 
@@ -25,11 +28,12 @@ namespace WebProductNotifier.Controllers
         
         public ActionResult SearchInShopByCode(string shopKey, string ItemID)
         {
+            // Создание списка с магазинами
             IDictionary<string, SearchInterface> dict = new Dictionary<string, SearchInterface>();
             dict["Rozetka"] = new Rozetka();
             dict["Foxtrot"] = new Foxtrot();
-
-            // dict[shopKey]; // - getShopObject
+            
+            // Получение товара по коду магазина и его коду.
             ProductFullInformationObject ProductFullInformationObject = dict[shopKey].getProductFullInformationObject(
                 new ObjectToSearch {shopKey = shopKey, ItemID = ItemID}
                 );

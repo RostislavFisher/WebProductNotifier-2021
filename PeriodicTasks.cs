@@ -18,13 +18,12 @@ public class PeriodicTasksService : BackgroundService
     private CrontabSchedule _schedule;
     private DateTime _nextRun;
 
-    private  string Schedule => "*/50 * * * * *"; //Runs every 10 seconds
+    private  string Schedule => "0 * * * *	"; //Runs every hour
 
     private readonly IServiceScopeFactory scopeFactory;
     public PeriodicTasksService(IServiceScopeFactory scopeFactory)
     {
         this.scopeFactory = scopeFactory;
-        
         _schedule = CrontabSchedule.Parse(Schedule,new CrontabSchedule.ParseOptions { IncludingSeconds = true });
         _nextRun = _schedule.GetNextOccurrence(DateTime.Now);
     }
@@ -40,33 +39,38 @@ public class PeriodicTasksService : BackgroundService
                  Process();
                 _nextRun = _schedule.GetNextOccurrence(DateTime.Now);
             }
-            await Task.Delay(5000, stoppingToken); //5 seconds delay
+            await Task.Delay(5000, stoppingToken); 
         }
         while (!stoppingToken.IsCancellationRequested);
     }
 
     private void Process()
     {
-        Console.WriteLine("====");
+        // Создание списка с магазинами
         IDictionary<string, SearchInterface> dict = new Dictionary<string, SearchInterface>();
         dict["Rozetka"] = new Rozetka();
         dict["Foxtrot"] = new Foxtrot();
 
-
         using (var scope = scopeFactory.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            // Обработка каждого пользователя, у которого есть товары в списке отслеживаний 
             foreach (var applicationUser in dbContext.Users.Include(s => s.Products).Where(i => i.Products.Any()))
             {
+                // Обработка каждого товара пользователя
                 foreach (var product in applicationUser.Products)
                 {
+                    // Получение актуальной информации о продукте
                     ProductFullInformationObject ProductFullInformationObject = dict[product.ShopKey].getProductFullInformationObject(
                         new ObjectToSearch {shopKey = product.ShopKey, ItemID = product.ItemID}
                     );
+                    // Если старая цена > новая цена - значит подешевело
                     if (product.Price > ProductFullInformationObject.PriceUAH)
                     {
-                        Console.WriteLine("=== Уведомить на почту ===");
+                        // Обновление информации о конкретном товаре
                         product.Price = ProductFullInformationObject.PriceUAH;
+                        
+                        // Уведомить пользователя
                         MailWork.SendMessage(applicationUser.Email, applicationUser, ProductFullInformationObject);
                         dbContext.Attach(product);
                     }

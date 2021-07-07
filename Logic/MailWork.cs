@@ -8,9 +8,13 @@ namespace WebProductNotifier.Logic
 {
     public class MailWork
     {
+        // Внимание! Не забывайте открывать доступ к небезопасным приложениям!
+        public static string from = "myeamil@myemail.com"; // Введите рабочую почту сюда
+        public static string fromPassword = "MyPassword123!"; // Введите рабочую почту сюда
+        
         public static void SendMessage(string to, ApplicationUser applicationUser, ProductFullInformationObject product)
         {
-            string from = "myeamil@myemail.com"; // put your email here
+            // Создание письма
             MailMessage message = new MailMessage(from, to);
             message.Subject = "WebProductNotifier";
             message.Body = $"Hey, {applicationUser.UserName}! Product {product.Title} has become cheaper!";
@@ -20,16 +24,15 @@ namespace WebProductNotifier.Logic
                 EnableSsl = true,
                 DeliveryMethod = System.Net.Mail.SmtpDeliveryMethod.Network,
                 UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(from, "myPassword") // put your password here
+                Credentials = new NetworkCredential(from, fromPassword)
                     };
             try
             {
-                client.Send(message);
+                client.Send(message); // Выслать письмо
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Exception caught in CreateTestMessage2(): {0}",
-                    ex.ToString());
+                Console.WriteLine("Exception caught {0}", ex.ToString());
             }
 
             

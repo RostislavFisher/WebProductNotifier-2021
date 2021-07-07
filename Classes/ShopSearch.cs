@@ -9,7 +9,6 @@ namespace WebProductNotifier.Classes
 {
     public class Rozetka : SearchInterface
     {
-        // https://search.rozetka.com.ua/search/api/v6/?front-type=xl&country=UA&lang=ru&text=fgh&price=FIRST-SECOND
         public List<ProductObject> searchProduct(ObjectSearch objectSearch)
         {
             string url = $"https://search.rozetka.com.ua/search/api/v6/?front-type=xl&country=UA&lang=ru&text={objectSearch.Title}&price={objectSearch.FirstPriceScope}-{objectSearch.SecondPriceScope}";
@@ -69,7 +68,6 @@ namespace WebProductNotifier.Classes
 
         }
     }
-
 
     public class Foxtrot : SearchInterface
     {
