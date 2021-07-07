@@ -71,7 +71,7 @@ export class SearchPage extends React.Component {
         return (
             <div>
                 <div class="row">
-                        <form>
+                        <form class="leftForm">
                             <p>
                                 <TextField onChange={(event)=>this.handleChange(event, "Title")} label="Название товара" variant="outlined" />
                             </p>
@@ -86,7 +86,7 @@ export class SearchPage extends React.Component {
                             <p>
                                 <TextField onChange={(event)=>this.handleChange(event, "Manufacturer")} label="Производитель" variant="outlined"/>
                             </p>
-                            <input type="button" value="Отправить" onClick={this.search}/>
+                            <input type="button" value="Отправить" onClick={this.search} class="btn btn-outline-primary"/>
                         </form>
                 <div class="col-md-8">
                     {this.state.resultSearch}

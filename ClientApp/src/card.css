@@ -16,5 +16,16 @@
 }
 
 .container{
-    max-width: none;
+    padding-right: 15px !important;
+    padding-left: 15px !important;
+    
+}
+
+.row{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.leftForm{
+    margin-left: 4%;
 }

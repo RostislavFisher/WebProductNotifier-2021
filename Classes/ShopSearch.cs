@@ -11,7 +11,7 @@ namespace WebProductNotifier.Classes
     {
         public List<ProductObject> searchProduct(ObjectSearch objectSearch)
         {
-            string url = $"https://search.rozetka.com.ua/search/api/v6/?front-type=xl&country=UA&lang=ru&text={objectSearch.Title}&price={objectSearch.FirstPriceScope}-{objectSearch.SecondPriceScope}";
+            string url = $"https://search.rozetka.com.ua/search/api/v6/?front-type=xl&country=UA&lang=ru&text={objectSearch.Title}&price={objectSearch.FirstPriceScope}-{objectSearch.SecondPriceScope}&producer={objectSearch.Manufacturer}";
             System.Net.WebClient wc = new System.Net.WebClient();
             string webData = wc.DownloadString(url);
 
@@ -69,6 +69,9 @@ namespace WebProductNotifier.Classes
         }
     }
 
+    // Поддержка Foxtrot сломалась. Когда я делал - все работало. Боюсь, поддержку Foxtrot в ближайшее время починить будет нельзя.
+    // Ребята не используют REST Api, а, значит, их придется распаршивать, что, естественно, и будет делом долгим, тяжелым в тестировке,
+    // тяжелым в получении данных, да и парсить мне леньки
     public class Foxtrot : SearchInterface
     {
         public List<ProductObject> searchProduct(ObjectSearch objectSearch)

@@ -31,7 +31,7 @@ export class ItemPage extends React.Component {
     }
     componentDidMount() {
         this.search();
-        if (this.state.IsLoggined === false) {
+        if (this.state.IsLoggined === true) {
             const makeRequest = async () => {
                 var userIDPromise = await authService.getUser()
                 this.setState({personID: userIDPromise["sub"]})
@@ -120,10 +120,10 @@ export class ItemPage extends React.Component {
                                     <div class="product-stock">In Stock</div>
                                     <hr></hr>
                                         <div class="btn-group cart">
-                                            <button type="button" class="btn btn-success" disabled={this.state.IsInNotifyList} onClick={this.addToNotify}>
+                                            <button type="button" class="btn btn-success" disabled={this.state.IsInNotifyList || !this.state.IsLoggined} onClick={this.addToNotify}>
                                                 Add to wishlist
                                             </button>
-                                            <button type="button" class="btn btn-danger" disabled={!this.state.IsInNotifyList} onClick={this.deleteFromNotify}>
+                                            <button type="button" class="btn btn-danger" disabled={!this.state.IsInNotifyList || !this.state.IsLoggined} onClick={this.deleteFromNotify}>
                                                 Delete from wishlist
                                             </button>
                                         </div>
